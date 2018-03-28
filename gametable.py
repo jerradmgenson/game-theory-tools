@@ -39,8 +39,8 @@ class GameTable:
 
         self.player1_name = player1_name
         self.player2_name = player2_name
-        self.player1_payoff_func = calc_player1_payoff
-        self.player2_payoff_func = calc_player2_payoff
+        self.calc_player1_payoff = calc_player1_payoff
+        self.calc_player2_payoff = calc_player2_payoff
         self.choices = choices
         self.player1_payoffs = {}
         self.player2_payoffs = {}
@@ -77,7 +77,7 @@ class GameTable:
             str_rep += '\n{}'.format(player2_choice).ljust(5)
             for player1_choice in self.choices:
                 p1_payoff, p2_payoff = self.index(player1_choice, player2_choice)
-                str_rep += '({}, {})'.format(p1_payoff, p2_payoff).ljust(10)
+                str_rep += '({}, {})'.format(round(p1_payoff), round(p2_payoff)).ljust(10)
 
             str_rep = str_rep[:-2]
 
