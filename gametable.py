@@ -67,19 +67,17 @@ class GameTable:
         return self.index(player_choices[0], player_choices[1])
 
     def __str__(self):
-        str_rep = '({}, {})\n\n'.format(self.player1_name, self.player2_name)
-        heading = ''.ljust(4)
+        str_rep = ';({}, {})\n\n'.format(self.player1_name, self.player2_name)
+        heading = ';'
         for scenario in self.choices:
-            heading += str(scenario).ljust(10)
+            heading += str(scenario) + ';'
 
         str_rep += heading
         for player2_choice in self.choices:
-            str_rep += '\n{}'.format(player2_choice).ljust(5)
+            str_rep += '\n{};'.format(player2_choice)
             for player1_choice in self.choices:
                 p1_payoff, p2_payoff = self.index(player1_choice, player2_choice)
-                str_rep += '({}, {})'.format(round(p1_payoff), round(p2_payoff)).ljust(10)
-
-            str_rep = str_rep[:-2]
+                str_rep += '({}, {});'.format(round(p1_payoff), round(p2_payoff))
 
         str_rep += '\n'
         return str_rep
