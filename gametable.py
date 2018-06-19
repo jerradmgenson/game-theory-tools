@@ -31,6 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """
 
+import re
+
 
 class GameTable:
     def __init__(self, player1_name=None, player2_name=None,
@@ -45,6 +47,39 @@ class GameTable:
         self.player1_payoffs = {}
         self.player2_payoffs = {}
 
+        self._player1_dominants = []
+        self._player2_dominants = []
+
+    def _find_dominants(self, p1_payoffs, p2_payoffs):
+        global_dominants = []
+        local_dominants = []
+        for p2_choice in self.choices:
+            for p1_choice in self.choices:
+                payoff = p1_payoffs[(p1_choice, p2_choice)]
+                if local_dominants:
+                    past_payoff = p1_payoffs[(local_dominants[0], p2_choice)]
+                    if past_payoff < payoff:
+                        local_dominants = [p1_choice]
+
+                    elif past_payoff == payoff:
+                        local_dominants.append(p1_choice)
+
+                else:
+                    local_dominants = [p1_choice]
+
+            if global_dominants:
+                for choice in global_dominants:
+                    if choice not in local_dominants:
+                        global_dominants.remove(choice)
+
+                for choice in local_dominants:
+                    if choice not in global_dominants:
+                        local_dominants.remove(choice)
+
+            global_dominants.extend(local_dominants)
+
+        return global_dominants
+
     def construct(self, choices=None):
         if choices:
             self.choices = choices
@@ -58,6 +93,12 @@ class GameTable:
 
                 self.player2_payoffs[(player2_choice, player1_choice)] = self.calc_player2_payoff(player2_choice,
                                                                                                   player1_choice)
+
+        self._player1_dominants = self._find_dominants(self.player1_payoffs,
+                                                       self.player2_payoffs)
+
+        self._player2_dominants = self._find_dominants(self.player2_payoffs,
+                                                       self.player1_payoffs)
 
     def index(self, player1_choice, player2_choice):
         return (self.player1_payoffs[(player1_choice, player2_choice)],
@@ -79,5 +120,20 @@ class GameTable:
                 p1_payoff, p2_payoff = self.index(player1_choice, player2_choice)
                 str_rep += '({}, {});'.format(round(p1_payoff), round(p2_payoff))
 
-        str_rep += '\n'
+        if self._player1_dominants:
+            str_rep += '\n\n{}\'s Dominant Strategies\n'.format(self.player1_name)
+            player1_dominants = '{}\n'.format(self._player1_dominants)
+            str_rep += re.sub('[\[\]]', '', player1_dominants)
+
+        else:
+            str_rep += 'None\n'
+
+        if self._player2_dominants:
+            str_rep += '\n{}\'s Dominant Strategies\n'.format(self.player2_name)
+            player2_dominants = '{}\n\n'.format(self._player2_dominants)
+            str_rep += re.sub('[\[\]]', '', player2_dominants)
+
+        else:
+            str_rep += 'None\n'
+
         return str_rep
