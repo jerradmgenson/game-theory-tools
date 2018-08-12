@@ -16,6 +16,8 @@ class GameTableTests(unittest.TestCase):
     PRICES = range(31, 59)
     TEST_DATA_CSV = 'test_data.csv'
     EXPECTED_GAME_TABLE_STR = open(TEST_DATA_CSV).read()
+    P1_EXPECTED_DOMINANTS = [58]
+    P2_EXPECTED_DOMINANTS = P1_EXPECTED_DOMINANTS
     
     @staticmethod
     def calc_payoff(my_price, their_price):
@@ -54,6 +56,11 @@ class GameTableTests(unittest.TestCase):
         fd.write(str(self.game_table))
         fd.close()        
         self.assertEqual(str(self.game_table), self.EXPECTED_GAME_TABLE_STR)
+        
+    def test_find_dominants(self):
+        self.game_table.construct()
+        self.assertEqual(self.game_table.player1_dominants, self.P1_EXPECTED_DOMINANTS)
+        self.assertEqual(self.game_table.player2_dominants, self.P2_EXPECTED_DOMINANTS)
 
 
 if __name__ == "__main__":
