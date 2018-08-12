@@ -51,13 +51,13 @@ class GameTable:
         self.player2_dominants = []
 
     def _find_dominants(self, p1_payoffs, p2_payoffs):
-        global_dominants = []
-        local_dominants = []
+        global_dominants = []        
         for p2_choice in self.choices:
+            local_dominants = []
             for p1_choice in self.choices:
-                payoff = p1_payoffs[(p1_choice, p2_choice)]
+                payoff = p1_payoffs[p1_choice, p2_choice]
                 if local_dominants:
-                    past_payoff = p1_payoffs[(local_dominants[0], p2_choice)]
+                    past_payoff = p1_payoffs[local_dominants[0], p2_choice]
                     if past_payoff < payoff:
                         local_dominants = [p1_choice]
 
@@ -88,11 +88,11 @@ class GameTable:
         self.players2_payoffs = {}
         for player1_choice in self.choices:
             for player2_choice in self.choices:
-                self.player1_payoffs[(player1_choice, player2_choice)] = self.calc_player1_payoff(player1_choice,
-                                                                                                  player2_choice)
+                self.player1_payoffs[player1_choice, player2_choice] = self.calc_player1_payoff(player1_choice,
+                                                                                                player2_choice)
 
-                self.player2_payoffs[(player2_choice, player1_choice)] = self.calc_player2_payoff(player2_choice,
-                                                                                                  player1_choice)
+                self.player2_payoffs[player2_choice, player1_choice] = self.calc_player2_payoff(player2_choice,
+                                                                                                player1_choice)
 
         self.player1_dominants = self._find_dominants(self.player1_payoffs,
                                                       self.player2_payoffs)
@@ -114,9 +114,9 @@ class GameTable:
             heading += str(scenario) + ';'
 
         str_rep += heading
-        for player2_choice in self.choices:
-            str_rep += '\n{};'.format(player2_choice)
-            for player1_choice in self.choices:
+        for player1_choice in self.choices:
+            str_rep += '\n{};'.format(player1_choice)
+            for player2_choice in self.choices:
                 p1_payoff, p2_payoff = self.index(player1_choice, player2_choice)
                 str_rep += '({}, {});'.format(round(p1_payoff), round(p2_payoff))
 
