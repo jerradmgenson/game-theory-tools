@@ -38,7 +38,7 @@ class GameTableTests(unittest.TestCase):
         self.assertTrue(self.game_table.player1_dominants)
         self.assertTrue(self.game_table.player2_dominants)
         
-    def test_index(self):
+    def test_getitem(self):
         self.game_table.construct()
         for p1_price in self.PRICES:
             for p2_price in self.PRICES:
