@@ -47,8 +47,8 @@ class GameTable:
         self.player1_payoffs = {}
         self.player2_payoffs = {}
 
-        self._player1_dominants = []
-        self._player2_dominants = []
+        self.player1_dominants = []
+        self.player2_dominants = []
 
     def _find_dominants(self, p1_payoffs, p2_payoffs):
         global_dominants = []
@@ -94,11 +94,11 @@ class GameTable:
                 self.player2_payoffs[(player2_choice, player1_choice)] = self.calc_player2_payoff(player2_choice,
                                                                                                   player1_choice)
 
-        self._player1_dominants = self._find_dominants(self.player1_payoffs,
-                                                       self.player2_payoffs)
+        self.player1_dominants = self._find_dominants(self.player1_payoffs,
+                                                      self.player2_payoffs)
 
-        self._player2_dominants = self._find_dominants(self.player2_payoffs,
-                                                       self.player1_payoffs)
+        self.player2_dominants = self._find_dominants(self.player2_payoffs,
+                                                      self.player1_payoffs)
 
     def index(self, player1_choice, player2_choice):
         return (self.player1_payoffs[(player1_choice, player2_choice)],
@@ -120,17 +120,17 @@ class GameTable:
                 p1_payoff, p2_payoff = self.index(player1_choice, player2_choice)
                 str_rep += '({}, {});'.format(round(p1_payoff), round(p2_payoff))
 
-        if self._player1_dominants:
+        if self.player1_dominants:
             str_rep += '\n\n{}\'s Dominant Strategies\n'.format(self.player1_name)
-            player1_dominants = '{}\n'.format(self._player1_dominants)
+            player1_dominants = '{}\n'.format(self.player1_dominants)
             str_rep += re.sub('[\[\]]', '', player1_dominants)
 
         else:
             str_rep += 'None\n'
 
-        if self._player2_dominants:
+        if self.player2_dominants:
             str_rep += '\n{}\'s Dominant Strategies\n'.format(self.player2_name)
-            player2_dominants = '{}\n\n'.format(self._player2_dominants)
+            player2_dominants = '{}\n\n'.format(self.player2_dominants)
             str_rep += re.sub('[\[\]]', '', player2_dominants)
 
         else:
