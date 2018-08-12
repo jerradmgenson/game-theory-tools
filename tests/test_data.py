@@ -11,7 +11,7 @@ class GameTableTestData:
     P2_EXPECTED_PAYOFFS = P1_EXPECTED_PAYOFFS
     PRICES = range(31, 59)
     TEST_DATA_CSV = 'test_data.csv'
-    P1_EXPECTED_DOMINANTS = [58]
+    P1_EXPECTED_DOMINANTS = []
     P2_EXPECTED_DOMINANTS = P1_EXPECTED_DOMINANTS
     
     def __init__(self):

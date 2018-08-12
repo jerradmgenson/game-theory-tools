@@ -34,8 +34,6 @@ class GameTableTests(unittest.TestCase):
         self.game_table.construct()
         self.assertEqual(self.game_table.player1_payoffs, self.test_data.P1_EXPECTED_PAYOFFS)
         self.assertEqual(self.game_table.player2_payoffs, self.test_data.P2_EXPECTED_PAYOFFS)
-        self.assertTrue(self.game_table.player1_dominants)
-        self.assertTrue(self.game_table.player2_dominants)
         
     def test_getitem(self):
         self.game_table.construct()
@@ -46,10 +44,10 @@ class GameTableTests(unittest.TestCase):
                 self.assertEqual(p2_payoff, self.test_data.P2_EXPECTED_PAYOFFS[p2_price, p1_price])
                 
     def test_str(self):
-        self.game_table.construct()
+        self.game_table.construct()        
         self.assertEqual(str(self.game_table), self.test_data.expected_game_table_str)
         
-    def test_find_dominants(self):
+    def test_find_dominants_no_dominants(self):
         self.game_table.construct()
         self.assertEqual(self.game_table.player1_dominants, self.test_data.P1_EXPECTED_DOMINANTS)
         self.assertEqual(self.game_table.player2_dominants, self.test_data.P2_EXPECTED_DOMINANTS)
