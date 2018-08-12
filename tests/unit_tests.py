@@ -47,9 +47,6 @@ class GameTableTests(unittest.TestCase):
                 
     def test_str(self):
         self.game_table.construct()
-        fd = open('test_data.csv', 'w')
-        fd.write(str(self.game_table))
-        fd.close()        
         self.assertEqual(str(self.game_table), self.test_data.expected_game_table_str)
         
     def test_find_dominants(self):
