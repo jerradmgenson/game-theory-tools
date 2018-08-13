@@ -103,7 +103,9 @@ class GameTable:
         return self.index(player_choices[0], player_choices[1])
 
     def __str__(self):
-        str_rep = ';({}, {})\n\n'.format(self.player1_name, self.player2_name)
+        str_rep = ';Vertical axis: {0};Horizontal axis: {1};Payoff pairs: {0}, {1}\n\n'.format(self.player1_name, 
+                                                                                               self.player2_name)
+        
         heading = ';'
         for scenario in self.choices:
             heading += str(scenario) + ';'
@@ -113,7 +115,7 @@ class GameTable:
             str_rep += '\n{};'.format(player1_choice)
             for player2_choice in self.choices:
                 p1_payoff, p2_payoff = self.index(player1_choice, player2_choice)
-                str_rep += '({}, {});'.format(round(p1_payoff), round(p2_payoff))
+                str_rep += '{}, {};'.format(round(p1_payoff), round(p2_payoff))
 
         str_rep += '\n\n{}\'s Dominant Strategies;'.format(self.player1_name)
         if self.player1_dominants:            
