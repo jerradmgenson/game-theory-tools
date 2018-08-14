@@ -1,7 +1,7 @@
 """
 BSD 3-Clause License
 
-Copyright (c) 2018, Jerrad Genson
+Copyright (c) 2018 Jerrad Genson
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -35,6 +35,29 @@ import re
 
 
 class GameTable:
+    """
+    A traditional game table structure used in game theory to represent the
+    payoff values for a two player game across a given domain. Currently
+    limited to two players.
+    
+    @Note
+      If any of the optional arguments to the constructor aren't given at
+      instantiation, they must be assigned to the instance prior to calling
+      its `construct` method. 
+    
+    @Options
+      player1_name: Player 1's name as a str.
+      player2_name: Player 2's name as a str.
+      calc_player1_payoff: A function with two parameters: player 1's current
+                           choice and player 2's current choice. Calculates the
+                           value of player 1's payoff and returns it.
+      calc_player2_payoff: A function with two parameters: player 2's current
+                           choice and player 1's current choice. Calculates the
+                           value of player 2's payoff and returns it.
+      choices: A collection of all possible player choices.
+      
+    """
+    
     def __init__(self, player1_name=None, player2_name=None,
                  calc_player1_payoff=None, calc_player2_payoff=None,
                  choices=None):
@@ -51,31 +74,73 @@ class GameTable:
         self.player2_dominants = []
 
     def _find_dominants(self, p1_payoffs, p2_payoffs):
-        global_dominants = []        
+        """
+        Find the dominant choices for player 1.
+        
+        @Args
+          p1_payoffs: Payoff dict for player 1.
+          p2_payoffs: Payoff dict for player 2.
+          
+        @Returns
+          A list of dominant choices for player 1.
+          
+        """        
+        
+        # The player's dominant values across the entire game domain.
+        global_dominants = []
+        # Outer loop corresponds to a row.        
         for iteration, p2_choice in enumerate(self.choices):
+            # The player's dominant values only across this row.
             local_dominants = []
+            
+            # Inner loop corresponds to a column. 
             for p1_choice in self.choices:
+                # Get player 1's payoff for the current game table cell.
                 payoff = p1_payoffs[p1_choice, p2_choice]
                 if local_dominants:
+                    # One or more local dominants already exist. Check payoff
+                    # of previous dominants.
                     past_payoff = p1_payoffs[local_dominants[0], p2_choice]
                     if past_payoff < payoff:
+                        # Current payoff is greater than previous payoff.
+                        # Replace previous dominant(s) with current dominant.
                         local_dominants = [p1_choice]
 
                     elif past_payoff == payoff:
+                        # Current payoff is equal to previous payoff.
+                        # Append current dominant to the list.
+                        # If current payoff is less than previous payoff, then
+                        # we just ignore it and move on.
                         local_dominants.append(p1_choice)
 
                 else:
+                    # No previous local dominant exists. The current choice is
+                    # a local dominant by default.
                     local_dominants = [p1_choice]
                     
             if iteration == 0:
+                # Local dominants are always global dominants on 1st iteration.
                 global_dominants = local_dominants
 
             else:
+                # Find the new global dominants by taking the intersection of
+                # the current local dominants and the old global dominants.
                 global_dominants = list(set(local_dominants) & set(global_dominants))
 
         return global_dominants
 
     def construct(self, choices=None):
+        """
+        Construct a game table from the given configuration.
+        
+        @Optional
+          choices: A collection of all possible player choices.
+          
+        @Returns
+          None
+          
+        """
+        
         if choices:
             self.choices = choices
 
@@ -96,6 +161,19 @@ class GameTable:
                                                       self.player1_payoffs)
 
     def index(self, player1_choice, player2_choice):
+        """
+        Return the payoff pair for the given players' choices.
+        Used by __getitems__ so object can use the index syntax.
+        
+        @Args
+          player1_choice: A specific choice for player 1.
+          player2_choice: A specific choice for player2.
+          
+        @Returns
+          The payoff pair that corresponds to the given players' choices.
+          
+        """
+        
         return (self.player1_payoffs[(player1_choice, player2_choice)],
                 self.player2_payoffs[(player2_choice, player1_choice)])
 
