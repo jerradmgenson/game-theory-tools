@@ -141,13 +141,15 @@ class GameTable:
           
         """
         
-        if choices:
-            self.choices = choices
+        if not choices:
+            # Custom choices were not supplied in the method call.
+            # Use the default configuration for the instance.
+            choices = self.choices
 
         self.player1_payoffs = {}
         self.players2_payoffs = {}
-        for player1_choice in self.choices:
-            for player2_choice in self.choices:
+        for player1_choice in choices:
+            for player2_choice in choices:
                 self.player1_payoffs[player1_choice, player2_choice] = self.calc_player1_payoff(player1_choice,
                                                                                                 player2_choice)
 
