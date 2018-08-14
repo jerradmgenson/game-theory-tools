@@ -146,6 +146,7 @@ class GameTable:
             # Use the default configuration for the instance.
             choices = self.choices
 
+        # Reinitialize payoff dicts to ensure data consistency.
         self.player1_payoffs = {}
         self.players2_payoffs = {}
         for player1_choice in choices:
@@ -176,30 +177,40 @@ class GameTable:
           
         """
         
-        return (self.player1_payoffs[(player1_choice, player2_choice)],
-                self.player2_payoffs[(player2_choice, player1_choice)])
+        return (self.player1_payoffs[player1_choice, player2_choice],
+                self.player2_payoffs[player2_choice, player1_choice])
 
     def __getitem__(self, player_choices):
         return self.index(player_choices[0], player_choices[1])
 
     def __str__(self):
+        # Table legend.
         str_rep = ';Vertical axis: {0};Horizontal axis: {1};Payoff pairs: {0}, {1}\n\n'.format(self.player1_name, 
                                                                                                self.player2_name)
-        
+        # Column heading for all columns.
         heading = ';'
-        for scenario in self.choices:
-            heading += str(scenario) + ';'
+        for choice in self.choices:
+            heading += str(choice) + ';'
 
         str_rep += heading
+        
+        # Outer loop is iterating over table rows.
         for player1_choice in self.choices:
+            # Row heading for current row only. 
             str_rep += '\n{};'.format(player1_choice)
+            
+            # Inner loop is iterating over table columns.
             for player2_choice in self.choices:
+                # Construct payoff pairs for current table cell.
                 p1_payoff, p2_payoff = self.index(player1_choice, player2_choice)
                 str_rep += '{}, {};'.format(round(p1_payoff), round(p2_payoff))
 
+        # Add dominant strategies to table string.
         str_rep += '\n\n{}\'s Dominant Strategies;'.format(self.player1_name)
         if self.player1_dominants:            
             player1_dominants = '{}\n'.format(self.player1_dominants)
+            
+            # Remove Python's list syntax from string. 
             str_rep += re.sub('[\[\]]', '', player1_dominants)
 
         else:
