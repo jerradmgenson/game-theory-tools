@@ -1,7 +1,10 @@
 """
+Defines `GameTable`, an implementation of the classic game table structure
+used by game theorists to represent the payoffs in a two-player game.
+
 BSD 3-Clause License
 
-Copyright (c) 2018 Jerrad Genson
+Copyright (c) 2018 Jerrad M. Genson
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
