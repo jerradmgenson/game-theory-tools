@@ -47,7 +47,7 @@ class GameTableTests(unittest.TestCase):
         self.test_data = GameTableTestData()
         super(GameTableTests, self).__init__(*args, **kwargs)
     
-    def calc_payoff(self, my_price, their_price):
+    def default_payoff(self, my_price, their_price):
         """
         A default payoff function that has no dominant strategies when it is
         used symmetrically.
@@ -63,8 +63,8 @@ class GameTableTests(unittest.TestCase):
         self.game_table = GameTable()
         self.game_table.player1_name = 'Player 1'
         self.game_table.player2_name = 'Player 2'
-        self.game_table.calc_player1_payoff = self.calc_payoff
-        self.game_table.calc_player2_payoff = self.calc_payoff
+        self.game_table.calc_player1_payoff = self.default_payoff
+        self.game_table.calc_player2_payoff = self.default_payoff
         self.game_table.choices = self.test_data.PRICES 
 
     def test_construct(self):
