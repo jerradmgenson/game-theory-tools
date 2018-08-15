@@ -49,7 +49,7 @@ class GameTableTests(unittest.TestCase):
     
     def calc_payoff(self, my_price, their_price):
         """
-        A generic payoff function that has no dominant strategies when it is
+        A default payoff function that has no dominant strategies when it is
         used symmetrically.
         """
         
