@@ -65,7 +65,7 @@ class GameTableTests(unittest.TestCase):
         self.game_table.player2_name = 'Player 2'
         self.game_table.calc_player1_payoff = self.default_payoff
         self.game_table.calc_player2_payoff = self.default_payoff
-        self.game_table.player2_choices = self.test_data.PRICES 
+        self.game_table.choices = self.test_data.PRICES 
 
     def test_construct(self):
         """ Test `gametable.GameTable.construct` """
@@ -135,7 +135,7 @@ class GameTableTests(unittest.TestCase):
         self.assertEqual(record.row, 27)
         self.assertEqual(record.column, 27)
         self.assertEqual(record.player1_name, 'Player 1')
-        self.assertEqual(record.player1_name, 'Player 2')
+        self.assertEqual(record.player2_name, 'Player 2')
         
 
 if __name__ == "__main__":
