@@ -57,7 +57,7 @@ class GameTable:
       calc_player2_payoff: A function with two parameters: player 2's current
                            choice and player 1's current choice. Calculates the
                            value of player 2's payoff and returns it.
-      choices: A collection of all possible player choices.
+      player2_choices: A collection of all possible player player2_choices.
       
     """
     
@@ -69,35 +69,38 @@ class GameTable:
         self.player2_name = player2_name
         self.calc_player1_payoff = calc_player1_payoff
         self.calc_player2_payoff = calc_player2_payoff
-        self.choices = choices
+        self.player2_choices = choices
         self.player1_payoffs = {}
         self.player2_payoffs = {}
 
         self.player1_dominants = []
         self.player2_dominants = []
+        
+    def __iter__(self):
+        return TableIterator(self)
 
     def _find_dominants(self, p1_payoffs, p2_payoffs):
         """
-        Find the dominant choices for player 1.
+        Find the dominant player2_choices for player 1.
         
         @Args
           p1_payoffs: Payoff dict for player 1.
           p2_payoffs: Payoff dict for player 2.
           
         @Returns
-          A list of dominant choices for player 1.
+          A list of dominant player2_choices for player 1.
           
         """        
         
         # The player's dominant values across the entire game domain.
         global_dominants = []
         # Outer loop corresponds to a row.        
-        for iteration, p2_choice in enumerate(self.choices):
+        for iteration, p2_choice in enumerate(self.player2_choices):
             # The player's dominant values only across this row.
             local_dominants = []
             
             # Inner loop corresponds to a column. 
-            for p1_choice in self.choices:
+            for p1_choice in self.player2_choices:
                 # Get player 1's payoff for the current game table cell.
                 payoff = p1_payoffs[p1_choice, p2_choice]
                 if local_dominants:
@@ -137,7 +140,7 @@ class GameTable:
         Construct a game table from the given configuration.
         
         @Optional
-          choices: A collection of all possible player choices.
+          player2_choices: A collection of all possible player player2_choices.
           
         @Returns
           None
@@ -145,9 +148,9 @@ class GameTable:
         """
         
         if not choices:
-            # Custom choices were not supplied in the method call.
+            # Custom player2_choices were not supplied in the method call.
             # Use the default configuration for the instance.
-            choices = self.choices
+            choices = self.player2_choices
 
         # Reinitialize payoff dicts to ensure data consistency.
         self.player1_payoffs = {}
@@ -168,7 +171,7 @@ class GameTable:
 
     def index(self, player1_choice, player2_choice):
         """
-        Return the payoff pair for the given players' choices.
+        Return the payoff pair for the given players' player2_choices.
         Used by __getitems__ so object can use the index syntax.
         
         @Args
@@ -176,7 +179,7 @@ class GameTable:
           player2_choice: A specific choice for player2.
           
         @Returns
-          The payoff pair that corresponds to the given players' choices.
+          The payoff pair that corresponds to the given players' player2_choices.
           
         """
         
@@ -190,20 +193,20 @@ class GameTable:
         # Table legend.
         str_rep = ';Vertical axis: {0};Horizontal axis: {1};Payoff pairs: {0}, {1}\n\n'.format(self.player1_name, 
                                                                                                self.player2_name)
-        # Column heading for all columns.
+        # Column heading for all player2_choices.
         heading = ';'
-        for choice in self.choices:
+        for choice in self.player2_choices:
             heading += str(choice) + ';'
 
         str_rep += heading
         
-        # Outer loop is iterating over table rows.
-        for player1_choice in self.choices:
+        # Outer loop is iterating over table player1_choices.
+        for player1_choice in self.player2_choices:
             # Row heading for current row only. 
             str_rep += '\n{};'.format(player1_choice)
             
-            # Inner loop is iterating over table columns.
-            for player2_choice in self.choices:
+            # Inner loop is iterating over table player2_choices.
+            for player2_choice in self.player2_choices:
                 # Construct payoff pairs for current table cell.
                 p1_payoff, p2_payoff = self.index(player1_choice, player2_choice)
                 str_rep += '{}, {};'.format(round(p1_payoff), round(p2_payoff))
@@ -228,3 +231,93 @@ class GameTable:
             str_rep += 'None\n'
 
         return str_rep
+    
+    
+class TableIterator:
+    """
+    An iterator for `GameTable` that provides for multiple simultaneous
+    iterations over a `GableTable` instance without corrupting its data.
+    
+    Args
+      game_table: The instance of `GameTable` to iterate over.
+    
+    """ 
+    
+    def __init__(self, game_table):
+        self.game_table = game_table
+        self.current_row = -1
+        self.current_column = -1
+        self.player1_choice = None
+        self.player2_choice = None
+        self.player1_choices = None
+        self.player2_choices = None
+        
+    def __next__(self):
+        if not self.player1_choices:
+            # choice iterators do not currently exist, so we must create them.
+            self.player1_choices = iter(self.game_table.choices)
+            self.player2_choices = iter(self.game_table.choices)
+            
+        try:
+            # Iterate over table columns (player 2's choices) until we reach
+            # the end of the current row.
+            player2_choice = next(self.player2_choices)
+            self.current_column += 1
+            
+        except StopIteration:
+            # We've reached the end of the row. Advance to the next row,
+            # starting at the first column. When the player1_choices iterator
+            # raises a StopIteration exception, we've reached the end of the
+            # game table.
+            self.player1_choice = next(self.player1_choices)                 
+            self.player2_choices = iter(self.game_table.player2_choices)
+            player2_choice = next(self.player2_choices)
+            self.current_column = 0
+            self.current_row += 1            
+            
+        return TableRecord(self.game_table, 
+                           self.player1_choice, 
+                           player2_choice, 
+                           self.current_row, 
+                           self.current_column)
+        
+        
+class TableRecord:
+    """
+    Represents a single record of a `GameTable` instance, this is what gets
+    returned by calling `TableIterator.__next__`.
+    
+    Args
+      game_table: The `GameTable` instance this table record belongs to.
+      player1_choice: Player1's choice for this `GameTable` record.
+      player2_choice: Player2's choice for this `GameTable` record.
+      row: The row number of this `GameTable` record.
+      column: The column number of this `GameTable` record.
+      
+    Attributes
+      player1_name
+      player2_name
+      player1_choice
+      player2_choice
+      player1_payoff
+      player2_payoff
+      row
+      column
+      
+    
+    """
+    
+    def __init__(self, game_table, player1_choice, player2_choice, row, column):
+        
+        self.player1_name = game_table.player1_name
+        self.player2_name = game_table.player2_name
+        self.player1_payoff = game_table.calc_player1_payoff(player1_choice, 
+                                                             player2_choice)
+        
+        self.player2_payoff = game_table.calc_player2_payoff(player2_choice, 
+                                                             player1_choice)
+        
+        self.player1_choice = player1_choice
+        self.player2_choice = player2_choice
+        self.row = row
+        self.column = column
