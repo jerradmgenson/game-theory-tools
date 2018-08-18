@@ -101,7 +101,43 @@ class GameTableTests(unittest.TestCase):
         self.game_table.construct()
         self.assertEqual(self.game_table.player1_dominants, self.test_data.P1_EXPECTED_DOMINANTS)
         self.assertEqual(self.game_table.player2_dominants, self.test_data.P2_EXPECTED_DOMINANTS)
-
+        
+    def test_iter(self):
+        """ Test iterating over a `GameTable` instance. """
+        
+        self.game_table.construct()
+        for record_number, record in enumerate(self.game_table):
+            if record_number == 0:
+                self.assertEqual(record.player1_choice, 31)
+                self.assertEqual(record.player2_choice, 31)
+                self.assertAlmostEqual(record.player1_payoff, 100.0)
+                self.assertAlmostEqual(record.player2_payoff, 100.0)
+                self.assertEqual(record.row, 0)
+                self.assertEqual(record.column, 0)
+                
+            elif record_number == 363:
+                self.assertEqual(record.player1_choice, 43)
+                self.assertEqual(record.player2_choice, 58)
+                self.assertAlmostEqual(record.player1_payoff, 3250.0)
+                self.assertAlmostEqual(record.player2_payoff, -1400.0)
+                self.assertEqual(record.row, 12)
+                self.assertEqual(record.column, 27)
+                
+            elif record_number == 783:
+                self.assertEqual(record.player1_choice, 58)
+                self.assertEqual(record.player2_choice, 58)
+                self.assertAlmostEqual(record.player1_payoff, 2800.0)
+                self.assertAlmostEqual(record.player2_payoff, 2800.0)
+                self.assertEqual(record.row, 27)
+                self.assertEqual(record.column, 27)
+        
+        self.assertEqual(record_number, 783)
+        self.assertEqual(record.row, 27)
+        self.assertEqual(record.column, 27)
+        self.assertEqual(record.player1_name, 'Player 1')
+        self.assertEqual(record.player1_name, 'Player 2')
+        
 
 if __name__ == "__main__":
     unittest.main()
+    
