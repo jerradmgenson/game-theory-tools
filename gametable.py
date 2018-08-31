@@ -36,6 +36,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import re
 
+import matplotlib
+
 
 class GameTable:
     """
@@ -231,6 +233,13 @@ class GameTable:
             str_rep += 'None\n'
 
         return str_rep
+
+    def line_graph(self):
+        """ Display a line graph of the GameTable payoff data. """
+        
+        if not self.player1_payoffs:
+            raise GameTableError('GameTable.line_graph called before GameTable.construct')
+
     
     
 class RowIterator:
@@ -329,3 +338,10 @@ class TableRecord:
         self.player2_choice = player2_choice
         self.row = row
         self.column = column
+
+
+class GameTableError(Exception):
+    """
+    An exception that gets raised when an error occurs with a GameTable instance.
+
+    """
