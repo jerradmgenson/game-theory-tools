@@ -251,7 +251,7 @@ class RowIterator:
     def __iter__(self):
         return ColumnIterator(self.game_table, self.current_row)
         
-    def next(self):
+    def __next__(self):
         self.current_row += 1
         if self.current_row == len(self.game_table.choices):
             raise StopIteration
@@ -277,7 +277,7 @@ class ColumnIterator:
         self.player1_choice = game_table.choices[row]
         self.player2_choices = iter(game_table.choices)
         
-    def next(self):            
+    def __next__(self):            
         # Iterate over table columns (player 2's choices) until we reach
         # the end of the current row.
         player2_choice = next(self.player2_choices)
