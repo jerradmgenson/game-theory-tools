@@ -235,7 +235,7 @@ class GameTable:
 
         return str_rep
 
-    def line_graph(self, player1_choice=None, player2_choice=None):
+    def line_graph(self, player1_choice=None, player2_choice=None, output=None):
         """ Display a line graph of the GameTable payoff data. """
         
         if not self.player1_payoffs:
@@ -250,7 +250,11 @@ class GameTable:
         choices = np.array(self.choices)
         axis.plot(choices, player1_payoffs, color='blue')
         axis.plot(choices, player2_payoffs, color='red')
-        plt.show()
+        if not output:
+            plt.show()
+            
+        else:
+            fig.savefig(output)
 
     
 class RowIterator:
