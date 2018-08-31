@@ -36,7 +36,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import re
 
-import matplotlib
+import numpy as np
+import matplotlib.pyplot as plt 
 
 
 class GameTable:
@@ -234,13 +235,23 @@ class GameTable:
 
         return str_rep
 
-    def line_graph(self):
+    def line_graph(self, player1_choice=None, player2_choice=None):
         """ Display a line graph of the GameTable payoff data. """
         
         if not self.player1_payoffs:
             raise GameTableError('GameTable.line_graph called before GameTable.construct')
+        
+        fig = plt.figure()
+        axis = fig.add_subplot(211)
+        axis.set_ylabel('payoff')
+        axis.set_xlabel('choice')
+        player1_payoffs = np.array([self[x, player2_choice or x][0] for x in self.choices])
+        player2_payoffs = np.array([self[player1_choice or y, y][1] for y in self.choices])
+        choices = np.array(self.choices)
+        axis.plot(choices, player1_payoffs, color='blue')
+        axis.plot(choices, player2_payoffs, color='red')
+        plt.show()
 
-    
     
 class RowIterator:
     """
@@ -276,6 +287,7 @@ class ColumnIterator:
     
     Args
       game_table: The instance of `GameTable` to iterate over.
+      row: The number of the current `GameTable` instance row.
     
     """ 
     
