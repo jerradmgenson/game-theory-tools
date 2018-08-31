@@ -106,32 +106,34 @@ class GameTableTests(unittest.TestCase):
         """ Test iterating over a `GameTable` instance. """
         
         self.game_table.construct()
-        for record_number, record in enumerate(self.game_table):
-            if record_number == 0:
-                self.assertEqual(record.player1_choice, 31)
-                self.assertEqual(record.player2_choice, 31)
-                self.assertAlmostEqual(record.player1_payoff, 100.0)
-                self.assertAlmostEqual(record.player2_payoff, 100.0)
-                self.assertEqual(record.row, 0)
-                self.assertEqual(record.column, 0)
+        for row_number, row in enumerate(self.game_table):
+            for column_number, record in enumerate(row):
+                record_number = (row_number + 1) * (column_number + 1)
+                if record_number == 1:
+                    self.assertEqual(record.player1_choice, 31)
+                    self.assertEqual(record.player2_choice, 31)
+                    self.assertAlmostEqual(record.player1_payoff, 100.0)
+                    self.assertAlmostEqual(record.player2_payoff, 100.0)
+                    self.assertEqual(record.row, 0)
+                    self.assertEqual(record.column, 0)
+                    
+                elif record_number == 363:
+                    self.assertEqual(record.player1_choice, 43)
+                    self.assertEqual(record.player2_choice, 58)
+                    self.assertAlmostEqual(record.player1_payoff, 3250.0)
+                    self.assertAlmostEqual(record.player2_payoff, -1400.0)
+                    self.assertEqual(record.row, 12)
+                    self.assertEqual(record.column, 27)
+                    
+                elif record_number == 784:
+                    self.assertEqual(record.player1_choice, 58)
+                    self.assertEqual(record.player2_choice, 58)
+                    self.assertAlmostEqual(record.player1_payoff, 2800.0)
+                    self.assertAlmostEqual(record.player2_payoff, 2800.0)
+                    self.assertEqual(record.row, 27)
+                    self.assertEqual(record.column, 27)
                 
-            elif record_number == 363:
-                self.assertEqual(record.player1_choice, 43)
-                self.assertEqual(record.player2_choice, 58)
-                self.assertAlmostEqual(record.player1_payoff, 3250.0)
-                self.assertAlmostEqual(record.player2_payoff, -1400.0)
-                self.assertEqual(record.row, 12)
-                self.assertEqual(record.column, 27)
-                
-            elif record_number == 783:
-                self.assertEqual(record.player1_choice, 58)
-                self.assertEqual(record.player2_choice, 58)
-                self.assertAlmostEqual(record.player1_payoff, 2800.0)
-                self.assertAlmostEqual(record.player2_payoff, 2800.0)
-                self.assertEqual(record.row, 27)
-                self.assertEqual(record.column, 27)
-        
-        self.assertEqual(record_number, 783)
+        self.assertEqual(record_number, 784)
         self.assertEqual(record.row, 27)
         self.assertEqual(record.column, 27)
         self.assertEqual(record.player1_name, 'Player 1')

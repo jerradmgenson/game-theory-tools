@@ -77,7 +77,7 @@ class GameTable:
         self.player2_dominants = []
         
     def __iter__(self):
-        return TableIterator(self)
+        return RowIterator(self)
 
     def _find_dominants(self, p1_payoffs, p2_payoffs):
         """
@@ -233,42 +233,55 @@ class GameTable:
         return str_rep
     
     
-class TableIterator:
+class RowIterator:
     """
     An iterator for `GameTable` that provides for multiple simultaneous
     iterations over a `GableTable` instance without corrupting its data.
+    This is the iterator returned by calling `GameTable.__iter__`. 
+    
+    Args
+      game_table: The instance of `GameTable` to iterate over.
+    
+    """
+    
+    def __init__(self, game_table):
+        self.game_table = game_table
+        self.current_row = -1
+        
+    def __iter__(self):
+        return ColumnIterator(self.game_table, self.current_row)
+        
+    def next(self):
+        self.current_row += 1
+        if self.current_row == len(self.game_table.choices):
+            raise StopIteration
+        
+        return self
+    
+    
+class ColumnIterator:
+    """
+    An iterator for `GameTable` that provides for multiple simultaneous
+    iterations over a `GableTable` instance without corrupting its data.
+    This is the iterator returned by calling `RowIterator.__iter__`.
     
     Args
       game_table: The instance of `GameTable` to iterate over.
     
     """ 
     
-    def __init__(self, game_table):
+    def __init__(self, game_table, row):
         self.game_table = game_table
-        self.current_row = 0
-        self.current_column = -1
-        self.player1_choices = iter(self.game_table.choices)
-        self.player2_choices = iter(self.game_table.choices)
-        self.player1_choice = next(self.player1_choices)
-        self.player2_choice = None        
+        self.current_row = row
+        self.current_column = -1        
+        self.player1_choice = game_table.choices[row]
+        self.player2_choices = iter(game_table.choices)
         
     def next(self):            
-        try:
-            # Iterate over table columns (player 2's choices) until we reach
-            # the end of the current row.
-            player2_choice = next(self.player2_choices)
-            self.current_column += 1
-            
-        except StopIteration:
-            # We've reached the end of the row. Advance to the next row,
-            # starting at the first column. When the player1_choices iterator
-            # raises a StopIteration exception, we've reached the end of the
-            # game table.
-            self.player1_choice = next(self.player1_choices)                 
-            self.player2_choices = iter(self.game_table.choices)
-            player2_choice = next(self.player2_choices)
-            self.current_column = 0
-            self.current_row += 1            
+        # Iterate over table columns (player 2's choices) until we reach
+        # the end of the current row.
+        player2_choice = next(self.player2_choices)
+        self.current_column += 1
             
         return TableRecord(self.game_table, 
                            self.player1_choice, 
