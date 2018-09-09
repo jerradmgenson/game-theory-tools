@@ -82,18 +82,19 @@ class GameTable:
     def __iter__(self):
         return RowIterator(self)
 
-    def _find_dominants(self, p1_payoffs, p2_payoffs):
+    def _find_dominants(self, player_name):
         """
         Find the dominant choices for player 1.
         
         @Args
-          p1_payoffs: Payoff dict for player 1.
-          p2_payoffs: Payoff dict for player 2.
+          player_name: The name of the player whose dominants to find.
           
         @Returns
           A list of dominant choices for player 1.
           
-        """        
+        """
+        
+        player = 'player1' if player_name == self.player1_name else 'player2'
         
         # The player's dominant values across the entire game domain.
         global_dominants = []
@@ -104,27 +105,29 @@ class GameTable:
             
             # Inner loop corresponds to a column. 
             for record in row:
+                player_payoff = getattr(record, player + '_payoff')
+                player_choice = getattr(record, player + '_choice')
                 if local_dominants:
                     # One or more local dominants already exist. Check payoff
                     # of previous dominants.
-                    if past_payoff < record.player1_payoff:
+                    if past_payoff < player_payoff:
                         # Current payoff is greater than previous payoff.
                         # Replace previous dominant(s) with current dominant.
-                        local_dominants = [record.player1_choice]
+                        local_dominants = [player_choice]
 
-                    elif past_payoff == record.player1_payoff:
+                    elif past_payoff == player_payoff:
                         # Current payoff is equal to previous payoff.
                         # Append current dominant to the list.
                         # If current payoff is less than previous payoff, then
                         # we just ignore it and move on.
-                        local_dominants.append(record.player1_choice)
+                        local_dominants.append(player_choice)
 
                 else:
                     # No previous local dominant exists. The current choice is
                     # a local dominant by default.
-                    local_dominants = [record.player1_choice]
+                    local_dominants = [player_choice]
 
-                past_payoff = record.player1_payoff
+                past_payoff = player_payoff
                     
             if row_number == 0:
                 # Local dominants are always global dominants on 1st row_number.
@@ -165,11 +168,8 @@ class GameTable:
                 self.player2_payoffs[player2_choice, player1_choice] = self.calc_player2_payoff(player2_choice,
                                                                                                 player1_choice)
 
-        self.player1_dominants = self._find_dominants(self.player1_payoffs,
-                                                      self.player2_payoffs)
-
-        self.player2_dominants = self._find_dominants(self.player2_payoffs,
-                                                      self.player1_payoffs)
+        self.player1_dominants = self._find_dominants(self.player1_name)
+        self.player2_dominants = self._find_dominants(self.player2_name)
 
     def index(self, player1_choice, player2_choice):
         """
