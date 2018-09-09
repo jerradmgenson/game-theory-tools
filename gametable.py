@@ -202,8 +202,8 @@ class GameTable:
 
         str_rep += heading
         for row in self:
-            for record_number, record in enumerate(row):
-                if record_number == 0:
+            for record in row:
+                if record.column == 0:
                     # Row heading for current row only. 
                     str_rep += '\n{};'.format(record.player1_choice)
 
