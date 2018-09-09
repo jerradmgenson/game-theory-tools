@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import unittest
 
 from gametable import GameTable
-from test_data import GameTableTestData
+from tests.test_data import GameTableTestData
 
 
 class GameTableTests(unittest.TestCase):
@@ -65,19 +65,18 @@ class GameTableTests(unittest.TestCase):
         self.game_table.player2_name = 'Player 2'
         self.game_table.calc_player1_payoff = self.default_payoff
         self.game_table.calc_player2_payoff = self.default_payoff
-        self.game_table.choices = self.test_data.PRICES 
+        self.game_table.choices = self.test_data.PRICES
+        self.game_table.construct()          
 
     def test_construct(self):
         """ Test `gametable.GameTable.construct` """
         
-        self.game_table.construct()
         self.assertEqual(self.game_table.player1_payoffs, self.test_data.P1_EXPECTED_PAYOFFS)
         self.assertEqual(self.game_table.player2_payoffs, self.test_data.P2_EXPECTED_PAYOFFS)
         
     def test_getitem(self):
         """ Test `gametable.GameTable.__getitem__` """
         
-        self.game_table.construct()
         # Outer loop is iterating over game table rows.
         for p1_price in self.test_data.PRICES:
             # Inner loops is iterating over game table columns.
@@ -89,7 +88,6 @@ class GameTableTests(unittest.TestCase):
     def test_str(self):
         """ Test `gametable.GameTable.__str__` """
         
-        self.game_table.construct()        
         self.assertEqual(str(self.game_table), self.test_data.expected_game_table_str)
         
     def test_find_dominants_no_dominants(self):
@@ -98,14 +96,12 @@ class GameTableTests(unittest.TestCase):
             
         """
         
-        self.game_table.construct()
         self.assertEqual(self.game_table.player1_dominants, self.test_data.P1_EXPECTED_DOMINANTS)
         self.assertEqual(self.game_table.player2_dominants, self.test_data.P2_EXPECTED_DOMINANTS)
         
     def test_iter(self):
         """ Test iterating over a `GameTable` instance. """
         
-        self.game_table.construct()
         for row_number, row in enumerate(self.game_table):
             for column_number, record in enumerate(row):
                 record_number = (row_number + 1) * (column_number + 1)

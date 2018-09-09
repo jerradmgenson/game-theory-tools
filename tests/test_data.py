@@ -51,7 +51,7 @@ class GameTableTestData:
     PRICES = range(31, 59)
     
     # Path to the test data CSV, which contains a `GameTable` instance string.
-    TEST_DATA_CSV = 'test_data.csv'
+    TEST_DATA_CSV = 'tests/test_data.csv'
     
     # Players' expected dominant strategies for the default case. 
     P1_EXPECTED_DOMINANTS = []
