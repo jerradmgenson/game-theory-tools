@@ -98,43 +98,42 @@ class GameTable:
         # The player's dominant values across the entire game domain.
         global_dominants = []
         # Outer loop corresponds to a row.        
-        for iteration, p2_choice in enumerate(self.choices):
+        for row_number, row in enumerate(self):
             # The player's dominant values only across this row.
             local_dominants = []
             
             # Inner loop corresponds to a column. 
-            for p1_choice in self.choices:
-                # Get player 1's payoff for the current game table cell.
-                payoff = p1_payoffs[p1_choice, p2_choice]
+            for record in row:
                 if local_dominants:
                     # One or more local dominants already exist. Check payoff
                     # of previous dominants.
-                    past_payoff = p1_payoffs[local_dominants[0], p2_choice]
-                    if past_payoff < payoff:
+                    if past_payoff < record.player1_payoff:
                         # Current payoff is greater than previous payoff.
                         # Replace previous dominant(s) with current dominant.
-                        local_dominants = [p1_choice]
+                        local_dominants = [record.player1_choice]
 
-                    elif past_payoff == payoff:
+                    elif past_payoff == record.player1_payoff:
                         # Current payoff is equal to previous payoff.
                         # Append current dominant to the list.
                         # If current payoff is less than previous payoff, then
                         # we just ignore it and move on.
-                        local_dominants.append(p1_choice)
+                        local_dominants.append(record.player1_choice)
 
                 else:
                     # No previous local dominant exists. The current choice is
                     # a local dominant by default.
-                    local_dominants = [p1_choice]
+                    local_dominants = [record.player1_choice]
+
+                past_payoff = record.player1_payoff
                     
-            if iteration == 0:
-                # Local dominants are always global dominants on 1st iteration.
+            if row_number == 0:
+                # Local dominants are always global dominants on 1st row_number.
                 global_dominants = local_dominants
 
             else:
                 # Find the new global dominants by taking the intersection of
                 # the current local dominants and the old global dominants.
-                global_dominants = list(set(local_dominants) & set(global_dominants))
+                global_dominants = list(set(local_dominants) & set(global_dominants))            
 
         return global_dominants
 
