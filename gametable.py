@@ -99,7 +99,7 @@ class GameTable:
         # The player's dominant values across the entire game domain.
         global_dominants = []
         # Outer loop corresponds to a row.        
-        for row_number, row in enumerate(self):
+        for row in self:
             # The player's dominant values only across this row.
             local_dominants = []
             
@@ -129,7 +129,7 @@ class GameTable:
 
                 past_payoff = player_payoff
                     
-            if row_number == 0:
+            if record.row == 0:
                 # Local dominants are always global dominants on 1st row_number.
                 global_dominants = local_dominants
 
