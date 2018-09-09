@@ -64,7 +64,7 @@ class GameTable:
       
     """
     
-    def __init__(self, player1_name=None, player2_name=None,
+    def __init__(self, player1_name='Player 1', player2_name='Player 2',
                  calc_player1_payoff=None, calc_player2_payoff=None,
                  choices=None):
 
@@ -248,8 +248,9 @@ class GameTable:
         player1_payoffs = np.array([self[x, player2_choice or x][0] for x in self.choices])
         player2_payoffs = np.array([self[player1_choice or y, y][1] for y in self.choices])
         choices = np.array(self.choices)
-        axis.plot(choices, player1_payoffs, color='blue')
-        axis.plot(choices, player2_payoffs, color='red')
+        player1_line, = axis.plot(choices, player1_payoffs, color='blue')
+        player2_line, = axis.plot(choices, player2_payoffs, color='red')
+        plt.legend((player1_line, player2_line), (self.player1_name, self.player2_name))
         if not output:
             plt.show()
             
