@@ -201,17 +201,14 @@ class GameTable:
             heading += str(choice) + ';'
 
         str_rep += heading
-        
-        # Outer loop is iterating over table player1_choices.
-        for player1_choice in self.choices:
-            # Row heading for current row only. 
-            str_rep += '\n{};'.format(player1_choice)
-            
-            # Inner loop is iterating over table choices.
-            for player2_choice in self.choices:
-                # Construct payoff pairs for current table cell.
-                p1_payoff, p2_payoff = self.index(player1_choice, player2_choice)
-                str_rep += '{}, {};'.format(round(p1_payoff), round(p2_payoff))
+        for row in self:
+            for record_number, record in enumerate(row):
+                if record_number == 0:
+                    # Row heading for current row only. 
+                    str_rep += '\n{};'.format(record.player1_choice)
+
+                str_rep += '{}, {};'.format(round(record.player1_payoff),
+                                            round(record.player2_payoff))
 
         # Add dominant strategies to table string.
         str_rep += '\n\n{}\'s Dominant Strategies;'.format(self.player1_name)
