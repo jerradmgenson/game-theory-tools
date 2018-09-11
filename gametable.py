@@ -35,12 +35,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 import re
-import logging
 
 import numpy as np
 import matplotlib.pyplot as plt
-
-logger = logging.getLogger(__name__)
 
 
 class GameTable:
@@ -103,7 +100,6 @@ class GameTable:
         """
         
         player = 'player1' if player_name == self.player1_name else 'player2'
-        logger.debug('Finding {} strategies for {}.'.format('dominated' if dominated else 'dominant', player))
         if dominated:
             cmp = lambda x, y: x > y
 
@@ -127,6 +123,7 @@ class GameTable:
                         # Current payoff is greater than previous payoff.
                         # Replace previous dominant(s) with current dominant.
                         local_dominants = [player_choice]
+                        past_payoff = player_payoff
 
                     elif past_payoff == player_payoff:
                         # Current payoff is equal to previous payoff.
@@ -139,9 +136,7 @@ class GameTable:
                     # No previous local dominant exists. The current choice is
                     # a local dominant by default.
                     local_dominants = [player_choice]
-
-                past_payoff = player_payoff
-                logging.debug('local_dominants: {}'.format(local_dominants))
+                    past_payoff = player_payoff
                     
             if record.row == 0:
                 # Local dominants are always global dominants on 1st row_number.
@@ -150,9 +145,8 @@ class GameTable:
             else:
                 # Find the new global dominants by taking the intersection of
                 # the current local dominants and the old global dominants.
-                global_dominants = list(set(local_dominants) & set(global_dominants))            
-
-        logging.debug('global_dominants: {}'.format(global_dominants))
+                global_dominants = list(set(local_dominants) & set(global_dominants))
+                
         return global_dominants
 
     def construct(self, choices=None):
@@ -185,6 +179,8 @@ class GameTable:
 
         self.player1_dominants = self._find_dominants(self.player1_name)
         self.player2_dominants = self._find_dominants(self.player2_name)
+        self.player1_dominated = self._find_dominants(self.player1_name, dominated=True)
+        self.player2_dominated = self._find_dominants(self.player2_name, dominated=True)
 
     def index(self, player1_choice, player2_choice):
         """
@@ -210,7 +206,7 @@ class GameTable:
         # Table legend.
         str_rep = ';Vertical axis: {0};Horizontal axis: {1};Payoff pairs: {0}, {1}\n\n'.format(self.player1_name, 
                                                                                                self.player2_name)
-        # Column heading for all choices.
+        # Column heading for all choices. 
         heading = ';'
         for choice in self.choices:
             heading += str(choice) + ';'
@@ -225,25 +221,30 @@ class GameTable:
                 str_rep += '{}, {};'.format(round(record.player1_payoff),
                                             round(record.player2_payoff))
 
+        def add_strategies(strategies):
+            if strategies:
+                str_rep = '{}\n'.format(strategies)
+
+                # Remove Python's list syntax from string.
+                str_rep = re.sub('[\[\]]', '', str_rep)
+
+            else:
+                str_rep = 'None\n'
+
+            return str_rep
+
         # Add dominant strategies to table string.
         str_rep += '\n\n{}\'s Dominant Strategies;'.format(self.player1_name)
-        if self.player1_dominants:            
-            player1_dominants = '{}\n'.format(self.player1_dominants)
-            
-            # Remove Python's list syntax from string. 
-            str_rep += re.sub('[\[\]]', '', player1_dominants)
-
-        else:
-            str_rep += 'None\n'
-
+        str_rep += add_strategies(self.player1_dominants)
         str_rep += '{}\'s Dominant Strategies;'.format(self.player2_name)
-        if self.player2_dominants:            
-            player2_dominants = '{}\n\n'.format(self.player2_dominants)
-            str_rep += re.sub('[\[\]]', '', player2_dominants)
-
-        else:
-            str_rep += 'None\n'
-
+        str_rep += add_strategies(self.player2_dominants)
+        
+        # Add dominated strategies to table string.
+        str_rep += '\n\n{}\'s Dominated Strategies;'.format(self.player1_name)
+        str_rep += add_strategies(self.player1_dominated)
+        str_rep += '{}\'s Dominated Strategies;'.format(self.player2_name)
+        str_rep += add_strategies(self.player2_dominated)
+        
         return str_rep
 
     def line_graph(self, player1_choice=None, player2_choice=None, output=None):

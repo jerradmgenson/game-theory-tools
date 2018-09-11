@@ -89,7 +89,7 @@ class GameTableTests(unittest.TestCase):
                 
     def test_str(self):
         """ Test `gametable.GameTable.__str__` """
-        
+
         self.assertEqual(str(self.game_table), self.test_data.expected_game_table_str)
         
     def test_find_dominants_no_dominants(self):
