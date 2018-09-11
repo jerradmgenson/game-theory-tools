@@ -35,9 +35,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 import re
+import logging
 
 import numpy as np
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
+
+logger = logging.getLogger(__name__)
 
 
 class GameTable:
@@ -100,6 +103,7 @@ class GameTable:
         """
         
         player = 'player1' if player_name == self.player1_name else 'player2'
+        logger.debug('Finding {} strategies for {}.'.format('dominated' if dominated else 'dominant', player))
         if dominated:
             cmp = lambda x, y: x > y
 
@@ -137,6 +141,7 @@ class GameTable:
                     local_dominants = [player_choice]
 
                 past_payoff = player_payoff
+                logging.debug('local_dominants: {}'.format(local_dominants))
                     
             if record.row == 0:
                 # Local dominants are always global dominants on 1st row_number.
@@ -147,6 +152,7 @@ class GameTable:
                 # the current local dominants and the old global dominants.
                 global_dominants = list(set(local_dominants) & set(global_dominants))            
 
+        logging.debug('global_dominants: {}'.format(global_dominants))
         return global_dominants
 
     def construct(self, choices=None):

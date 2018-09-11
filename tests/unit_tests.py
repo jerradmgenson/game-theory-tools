@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 import unittest
+import logging
 
 from gametable import GameTable
 from tests.test_data import GameTableTestData
@@ -45,6 +46,7 @@ class GameTableTests(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         # Get static test data from the `test_data` module.
         self.test_data = GameTableTestData()
+        logging.basicConfig(level=logging.DEBUG)        
         super(GameTableTests, self).__init__(*args, **kwargs)
     
     def default_payoff(self, my_price, their_price):
