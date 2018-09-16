@@ -1,4 +1,4 @@
-pipline {
+pipeline {
     agent none
     stages {
         stage('Test') {
@@ -8,7 +8,7 @@ pipline {
 		}
 	    }
 	    steps {
-	        sh 'python3 -m unittest tests.unit_tests'
+	        sh 'python -m unittest tests.unit_tests'
 	    }
 	}
     }
