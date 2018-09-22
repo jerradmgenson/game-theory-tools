@@ -84,6 +84,43 @@ class GameTable:
     def __iter__(self):
         return RowIterator(self)
 
+    def _find_player1_dominants(self):
+        """
+        Find all dominant strategies for player 1.
+
+        Returns
+          A list of player 1's dominant strategies (choices).
+
+        """
+
+        # Construct a list of columns of player1 payoff values.
+        columns = []
+        for row in self:
+            for record_number, record in enumerate(row):
+                try:
+                    columns[record_number].append(record.player1_payoff)
+
+                except IndexError:
+                    columns.append([record.player1_payoff])
+            
+
+        # Find the indices of the maximum values in each column.
+        max_indices = []
+        for column in columns:
+            max_value = max(column)
+            max_indices.append([index for index, value in enumerate(column) if value == max_value])
+
+        # Check if any max value indices match across all columns.
+        matching_indices = max_indices[0]
+        for indices in max_indices[1:]:
+            matching_indices = list(set(matching_indices) & set(indices))
+
+        # Return a list of strategies corresponding to the matching indices.
+        choices_list = list(self.choices)
+        dominant_strategies = [choices_list[index] for index in matching_indices]
+
+        return dominant_strategies
+
     def _find_dominants(self, player_name, dominated=False):
         """
         Find the dominant choices for player 1.
@@ -177,7 +214,7 @@ class GameTable:
                 self.player2_payoffs[player2_choice, player1_choice] = self.calc_player2_payoff(player2_choice,
                                                                                                 player1_choice)
 
-        self.player1_dominants = self._find_dominants(self.player1_name)
+        self.player1_dominants = self._find_player1_dominants()
         self.player2_dominants = self._find_dominants(self.player2_name)
         self.player1_dominated = self._find_dominants(self.player1_name, dominated=True)
         self.player2_dominated = self._find_dominants(self.player2_name, dominated=True)
