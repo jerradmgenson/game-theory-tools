@@ -100,6 +100,34 @@ class GameTableTests(unittest.TestCase):
         
         self.assertEqual(self.game_table.player1_dominants, self.test_data.P1_EXPECTED_DOMINANTS)
         self.assertEqual(self.game_table.player2_dominants, self.test_data.P2_EXPECTED_DOMINANTS)
+
+    def test_find_dominants_one_dominant(self):
+        """ Test `gametable.GameTable._find_dominants` on a case with one
+            dominant strategy per player.
+
+        """
+
+        def calc_player1_payoff(my_price, their_price):
+            if my_price == 10:
+                return 2
+
+            else:
+                return 1
+
+        def calc_player2_payoff(my_price, their_price):
+            if my_price == 9:
+                return 2
+
+            else:
+                return 1
+
+        game_table = GameTable(calc_player1_payoff=calc_player1_payoff,
+                               calc_player2_payoff=calc_player2_payoff,
+                               choices=range(0, 11))
+
+        game_table.construct()
+        self.assertEqual(game_table.player1_dominants, [10])
+        self.assertEqual(game_table.player2_dominants, [9])
         
     def test_iter(self):
         """ Test iterating over a `GameTable` instance. """
