@@ -84,6 +84,29 @@ class GameTable:
     def __iter__(self):
         return RowIterator(self)
 
+    def _find_dominants(self, record_collections):
+        """
+        Common code for player 1 and player 2 find dominants methods.
+
+        """
+
+        # Find the indices of the maximum values in each column.
+        max_indices = []
+        for record_collection in record_collections:
+            max_value = max(record_collection)
+            max_indices.append([index for index, value in enumerate(record_collection) if value == max_value])
+
+        # Check if any max value indices match across all columns.
+        matching_indices = max_indices[0]
+        for indices in max_indices[1:]:
+            matching_indices = list(set(matching_indices) & set(indices))
+
+        # Return a list of strategies corresponding to the matching indices.
+        choices_list = list(self.choices)
+        dominant_strategies = [choices_list[index] for index in matching_indices]
+
+        return dominant_strategies
+
     def _find_player1_dominants(self):
         """
         Find all dominant strategies for player 1.
@@ -103,23 +126,7 @@ class GameTable:
                 except IndexError:
                     columns.append([record.player1_payoff])
             
-
-        # Find the indices of the maximum values in each column.
-        max_indices = []
-        for column in columns:
-            max_value = max(column)
-            max_indices.append([index for index, value in enumerate(column) if value == max_value])
-
-        # Check if any max value indices match across all columns.
-        matching_indices = max_indices[0]
-        for indices in max_indices[1:]:
-            matching_indices = list(set(matching_indices) & set(indices))
-
-        # Return a list of strategies corresponding to the matching indices.
-        choices_list = list(self.choices)
-        dominant_strategies = [choices_list[index] for index in matching_indices]
-
-        return dominant_strategies
+        return self._find_dominants(columns)
 
     def _find_player2_dominants(self):
         """
@@ -132,25 +139,9 @@ class GameTable:
 
         # Construct a list of rows of player 2's payoff values.
         rows = [[record.player2_payoff for record in row] for row in self]
+        return self._find_dominants(rows)
 
-        # Find the indices of the maximum values in each row.
-        max_indices = []
-        for row in rows:
-            max_value = max(row)
-            max_indices.append([index for index, value in enumerate(row) if value == max_value])
-
-        # Check if any max value indices match across all rows.
-        matching_indices = max_indices[0]
-        for indices in max_indices[1:]:
-            matching_indices = list(set(matching_indices) & set(indices))
-
-        # Return a list of strategies corresponding to the matching indices.
-        choices_list = list(self.choices)
-        dominant_strategies = [choices_list[index] for index in matching_indices]
-
-        return dominant_strategies
-
-    def _find_dominants(self, player_name, dominated=False):
+    def _find_dominated(self, player_name, dominated=False):
         """
         Find the dominant choices for player 1.
         
@@ -245,8 +236,8 @@ class GameTable:
 
         self.player1_dominants = self._find_player1_dominants()
         self.player2_dominants = self._find_player2_dominants()
-        self.player1_dominated = self._find_dominants(self.player1_name, dominated=True)
-        self.player2_dominated = self._find_dominants(self.player2_name, dominated=True)
+        self.player1_dominated = self._find_dominated(self.player1_name, dominated=True)
+        self.player2_dominated = self._find_dominated(self.player2_name, dominated=True)
 
     def index(self, player1_choice, player2_choice):
         """
