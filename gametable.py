@@ -84,7 +84,7 @@ class GameTable:
     def __iter__(self):
         return RowIterator(self)
 
-    def _find_dominants(self, record_collections):
+    def _find_dominants(self, record_collections, cmp=max):
         """
         Common code for player 1 and player 2 find dominants methods.
 
@@ -93,7 +93,7 @@ class GameTable:
         # Find the indices of the maximum values in each column.
         max_indices = []
         for record_collection in record_collections:
-            max_value = max(record_collection)
+            max_value = cmp(record_collection)
             max_indices.append([index for index, value in enumerate(record_collection) if value == max_value])
 
         # Check if any max value indices match across all columns.
@@ -107,7 +107,7 @@ class GameTable:
 
         return dominant_strategies
 
-    def _find_player1_dominants(self):
+    def _find_player1_dominants(self, dominated=False):
         """
         Find all dominant strategies for player 1.
 
@@ -126,9 +126,9 @@ class GameTable:
                 except IndexError:
                     columns.append([record.player1_payoff])
             
-        return self._find_dominants(columns)
+        return self._find_dominants(columns, min if dominated else max)
 
-    def _find_player2_dominants(self):
+    def _find_player2_dominants(self, dominated=False):
         """
         Find all dominant strategies for player 2.
 
@@ -139,72 +139,7 @@ class GameTable:
 
         # Construct a list of rows of player 2's payoff values.
         rows = [[record.player2_payoff for record in row] for row in self]
-        return self._find_dominants(rows)
-
-    def _find_dominated(self, player_name, dominated=False):
-        """
-        Find the dominant choices for player 1.
-        
-        @Args
-          player_name: The name of the player whose dominants to find.
-
-        @Optional
-          dominated: Set to True to find dominated choices instead of dominants.
-          
-        @Returns
-          A list of dominant choices for player 1.
-          
-        """
-        
-        player = 'player1' if player_name == self.player1_name else 'player2'
-        if dominated:
-            cmp = lambda x, y: x > y
-
-        else:
-            cmp = lambda x, y: x < y
-        
-        # The player's dominant values across the entire game domain.
-        global_dominants = []
-        # Outer loop corresponds to a row.        
-        for row in self:
-            # The player's dominant values only across this row.
-            local_dominants = []
-            # Inner loop corresponds to a column. 
-            for record in row:
-                player_payoff = getattr(record, player + '_payoff')
-                player_choice = getattr(record, player + '_choice')
-                if local_dominants:
-                    # One or more local dominants already exist. Check payoff
-                    # of previous dominants.
-                    if cmp(past_payoff, player_payoff):
-                        # Current payoff is greater than previous payoff.
-                        # Replace previous dominant(s) with current dominant.
-                        local_dominants = [player_choice]
-                        past_payoff = player_payoff
-
-                    elif past_payoff == player_payoff:
-                        # Current payoff is equal to previous payoff.
-                        # Append current dominant to the list.
-                        # If current payoff is less than previous payoff, then
-                        # we just ignore it and move on.
-                        local_dominants.append(player_choice)
-
-                else:
-                    # No previous local dominant exists. The current choice is
-                    # a local dominant by default.
-                    local_dominants = [player_choice]
-                    past_payoff = player_payoff
-                    
-            if record.row == 0:
-                # Local dominants are always global dominants on 1st row_number.
-                global_dominants = local_dominants
-
-            else:
-                # Find the new global dominants by taking the intersection of
-                # the current local dominants and the old global dominants.
-                global_dominants = list(set(local_dominants) & set(global_dominants))
-                
-        return global_dominants
+        return self._find_dominants(rows, min if dominated else max)
 
     def construct(self, choices=None):
         """
@@ -236,8 +171,8 @@ class GameTable:
 
         self.player1_dominants = self._find_player1_dominants()
         self.player2_dominants = self._find_player2_dominants()
-        self.player1_dominated = self._find_dominated(self.player1_name, dominated=True)
-        self.player2_dominated = self._find_dominated(self.player2_name, dominated=True)
+        self.player1_dominated = self._find_player1_dominants(dominated=True)
+        self.player2_dominated = self._find_player2_dominants(dominated=True)
 
     def index(self, player1_choice, player2_choice):
         """
