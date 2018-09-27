@@ -141,6 +141,42 @@ class GameTable:
         rows = [[record.player2_payoff for record in row] for row in self]
         return self._find_dominants(rows, min if dominated else max)
 
+    def _find_nash_equilibrium(self):
+        """
+        Find any Nash Equilibrium's that exist in this game table.
+        """
+
+        # Separate table records into columns (for player 1) data and
+        # rows (for player 2).
+        columns = []
+        rows = []
+        for row in self:
+            row_data = []
+            for record_number, record in enumerate(row):
+                try:
+                    columns[record_number].append(record.player1_payoff)
+
+                except IndexError:
+                    columns.append([record.player1_payoff])
+
+                row_data.append(record.player2_payoff)
+
+            rows.append(row_data)
+
+        # Iterate over each record in the table and check if it is the maximum
+        # payoff for player 1 in the column and the maximum payoff for player 2
+        # in the row. If both of these conditions are true, the corresponding
+        # player choices represent a Nash Equilibrium.
+        equilibria = set()
+        for row_number, row in enumerate(self):
+            for column_number, record in enumerate(self):
+                player1_best = record.player1_payoff == max(columns[column_number])
+                player2_best = record.player2_payoff == max(rows[row_number])
+                if player1_best and player2_best:
+                    equilibria.add((record.player1_choice, record.player2_choice))
+
+        return equilibria
+
     def construct(self, choices=None):
         """
         Construct a game table from the given configuration.
