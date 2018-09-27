@@ -80,6 +80,7 @@ class GameTable:
         self.player2_dominants = []
         self.player1_dominated = []
         self.player2_dominated = []
+        self.nash_equilibria = set()
         
     def __iter__(self):
         return RowIterator(self)
@@ -141,9 +142,9 @@ class GameTable:
         rows = [[record.player2_payoff for record in row] for row in self]
         return self._find_dominants(rows, min if dominated else max)
 
-    def _find_nash_equilibrium(self):
+    def _find_nash_equilibria(self):
         """
-        Find any Nash Equilibrium's that exist in this game table.
+        Find any Nash Equilibria that exist in this game table.
         """
 
         # Separate table records into columns (for player 1) data and
@@ -209,6 +210,7 @@ class GameTable:
         self.player2_dominants = self._find_player2_dominants()
         self.player1_dominated = self._find_player1_dominants(dominated=True)
         self.player2_dominated = self._find_player2_dominants(dominated=True)
+        self.nash_equilibria = self._find_nash_equilibria()
 
     def index(self, player1_choice, player2_choice):
         """
@@ -272,6 +274,12 @@ class GameTable:
         str_rep += add_strategies(self.player1_dominated)
         str_rep += '{}\'s Dominated Strategies;'.format(self.player2_name)
         str_rep += add_strategies(self.player2_dominated)
+
+        # Add Nash Equilibria to table string.
+        for count, equilibrium in enumerate(self.nash_equilibria):
+            str_rep += '\n\n' if count == 0 else '\n'
+            number = ' #' + str(count) if len(equilibrium) > 1 else ''
+            str_rep += 'Nash Equilibrium{};{}'.format(number, equilibrium)
         
         return str_rep
 
