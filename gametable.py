@@ -170,7 +170,7 @@ class GameTable:
         # player choices represent a Nash Equilibrium.
         equilibria = set()
         for row_number, row in enumerate(self):
-            for column_number, record in enumerate(self):
+            for column_number, record in enumerate(row):
                 player1_best = record.player1_payoff == max(columns[column_number])
                 player2_best = record.player2_payoff == max(rows[row_number])
                 if player1_best and player2_best:
@@ -278,7 +278,7 @@ class GameTable:
         # Add Nash Equilibria to table string.
         for count, equilibrium in enumerate(self.nash_equilibria):
             str_rep += '\n\n' if count == 0 else '\n'
-            number = ' #' + str(count) if len(equilibrium) > 1 else ''
+            number = ' #' + str(count + 1) if len(equilibrium) > 1 else ''
             str_rep += 'Nash Equilibrium{};{}'.format(number, equilibrium)
         
         return str_rep
