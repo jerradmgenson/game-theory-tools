@@ -178,6 +178,62 @@ class GameTable:
 
         return equilibria
 
+    def _find_minimax(self):
+        # For each player's choice, construct an expression that describes their
+        # expected payoff based on the other player's choice. The last of the
+        # opposing player's choices should be represented in each expression as
+        # one minus the sum of the other choice variables so that the equations
+        # may later be solved.
+
+        # Construct player 1's payoff expressions.
+        player1_expressions = []
+        player1_variables = []
+        for column in self.iterplayer1:
+            expression = 0
+            for record_number, record in enumerate(column):
+                try:
+                    variable = player1_variables[record_number]
+
+                except IndexError:
+                    if record_number + 1 != len(column):
+                        variable = sympy.symbols('x' + str(record_number))
+
+                    else:
+                        variable = 1 - sum(player1_variables)
+                        
+                    player1_variables.append(variable)
+
+                expression += record.payoff * variable
+                
+            player1_expressions.append(expression)
+
+        player2_expressions = []
+        player2_variables = []
+        for row in self.iterplayer2:
+            expression = 0
+            for record_number, record in enumerate(row):
+                try:
+                    variable = player2_variables[record_number]
+
+                except IndexError:
+                    variable = sympy.symbols('y' + str(record_number))
+
+                expression += record.payoff * variable
+
+            player2_expressions.append(expression)
+
+        # For each player, set each of that player's choice equations against
+        # as equal to each other and solve the system of equations.
+        player1_solutions = sympy.linsolve(player1_expressions, player1_variables)
+        player2_solutions = sympy.linsolve(player2_expressions, player2_variables)
+
+        # Return a tuple of sets describing each player's mixing ratios.
+        # The first element in the tuple is player 1's ratios and the
+        # second element is player 2's ratios. Each tuple element is a set of
+        # mixing ratios in the same order as the order of choices in the game
+        # table instance.
+        return player1_solutions, player2_solutions
+
     def construct(self, choices=None):
         """
         Construct a game table from the given configuration.
