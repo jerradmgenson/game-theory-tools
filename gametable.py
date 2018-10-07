@@ -184,43 +184,43 @@ class GameTable:
         # opposing player's choices should be represented in each expression as
         # one minus the sum of the other choice variables so that the equations
         # may later be solved.
+        def create_payoff_expressions(player_name):
+            if player_name == self.player1_name:
+                base_variable = 'x'
+                player_number = '1'
 
-        # Construct player 1's payoff expressions.
-        player1_expressions = []
-        player1_variables = []
-        for column in self.iterplayer1:
-            expression = 0
-            for record_number, record in enumerate(column):
-                try:
-                    variable = player1_variables[record_number]
+            elif player_name == self.player2_name:
+                base_variable = 'y'
+                player_number = '2'
 
-                except IndexError:
-                    if record_number + 1 != len(column):
-                        variable = sympy.symbols('x' + str(record_number))
+            else:
+                raise ValueError("`player_name` not '{}' or '{}'.".format(self.player1_name, self.player2_name))
 
-                    else:
-                        variable = 1 - sum(player1_variables)
-                        
-                    player1_variables.append(variable)
+            expressions = []
+            variables = []
+            for records in getattr(self, 'iterplayer' + player_number):
+                expression = 0
+                for record_number, record in enumerate(records):
+                    try:
+                        variable = variables[record_number]
 
-                expression += record.payoff * variable
-                
-            player1_expressions.append(expression)
+                    except IndexError:
+                        if record_number + 1 < len(records):
+                            variable = sympy.symbols(base_variable + str(record_number))
 
-        player2_expressions = []
-        player2_variables = []
-        for row in self.iterplayer2:
-            expression = 0
-            for record_number, record in enumerate(row):
-                try:
-                    variable = player2_variables[record_number]
+                        else:
+                            variable = 1 - sum(variables)
 
-                except IndexError:
-                    variable = sympy.symbols('y' + str(record_number))
+                        variables.append(variable)
 
-                expression += record.payoff * variable
+                    expression += record.payoff * variable
 
-            player2_expressions.append(expression)
+                expressions.append(expression)
+
+            return expressions, variables
+
+        player1_expressions, player1_variables = create_payoff_expressions(self.player1_name)
+        player2_expressions, player2_variables = create_payoff_expressions(self.player2_name)        
 
         # For each player, set each of that player's choice equations against
         # as equal to each other and solve the system of equations.
