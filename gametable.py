@@ -67,7 +67,7 @@ class GameTable:
    
     def __init__(self, player1_name='Player 1', player2_name='Player 2',
                  calc_player1_payoff=None, calc_player2_payoff=None,
-                 choices=None):
+                 choices=None, minimax=False):
 
         self.player1_name = player1_name
         self.player2_name = player2_name
@@ -82,7 +82,10 @@ class GameTable:
         self.player1_dominated = []
         self.player2_dominated = []
         self.nash_equilibria = set()
-       
+        self.minimax = False
+        self.player1_mixing_ratios = None
+        self.player2_mixing_ratios = None
+
     def __iter__(self):
         return RowIterator(self)
 
@@ -277,9 +280,10 @@ class GameTable:
         self.player1_dominated = self._find_player1_dominants(dominated=True)
         self.player2_dominated = self._find_player2_dominants(dominated=True)
         self.nash_equilibria = self._find_nash_equilibria()
-        p1_mixing_ratios, p2_mixing_rations = self._find_minimax()
-        self.player1_mixing_ratios = p1_mixing_ratios
-        self.player2_mixing_ratios = p2_mixing_rations
+        if self.minimax:    
+            p1_mixing_ratios, p2_mixing_rations = self._find_minimax()
+            self.player1_mixing_ratios = p1_mixing_ratios
+            self.player2_mixing_ratios = p2_mixing_rations
 
     def index(self, player1_choice, player2_choice):
         """
