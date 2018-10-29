@@ -353,6 +353,16 @@ class GameTable:
             str_rep += '\n\n' if count == 0 else '\n'
             number = ' #' + str(count + 1) if len(equilibrium) > 1 else ''
             str_rep += 'Nash Equilibrium{};{}'.format(number, equilibrium)
+
+        if self.minimax:
+            # Add minimax ratios to table string.
+            str_rep += '\n\nPlayer 1 mixing ratios\n'
+            for choice, ratio in zip(self.choices, self.player1_mixing_ratios):
+                str_rep += 'Choice: {} Ratio: {};'.format(choice, ratio)
+
+            str_rep += '\n\nPlayer 2 mixing ratios\n'
+            for choice, ratio in zip(self.choices, self.player2_mixing_ratios):
+                str_rep += 'Choice: {} Ratio: {};'.format(choice, ratio)
         
         return str_rep
 
