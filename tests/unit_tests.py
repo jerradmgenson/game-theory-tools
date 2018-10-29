@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import unittest
 import logging
+from functools import partial
 
 from gametable import GameTable
 from tests.test_data import GameTableTestData
@@ -46,6 +47,13 @@ class GameTableTests(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         # Get static test data from the `test_data` module.
         self.test_data = GameTableTestData()
+        self.proto_game_table = partial(GameTable,
+                                        player1_name='Player 1',
+                                        player2_name='Player 2',
+                                        calc_player1_payoff=self.default_payoff,
+                                        calc_player2_payoff=self.default_payoff,
+                                        choices=self.test_data.PRICES)
+        
         logging.basicConfig(level=logging.DEBUG)        
         super(GameTableTests, self).__init__(*args, **kwargs)
     
@@ -62,13 +70,8 @@ class GameTableTests(unittest.TestCase):
         return total_profit
 
     def setUp(self):
-        self.game_table = GameTable()
-        self.game_table.player1_name = 'Player 1'
-        self.game_table.player2_name = 'Player 2'
-        self.game_table.calc_player1_payoff = self.default_payoff
-        self.game_table.calc_player2_payoff = self.default_payoff
-        self.game_table.choices = self.test_data.PRICES
-        self.game_table.construct()          
+        self.game_table = self.proto_game_table()
+        self.game_table.construct()
 
     def test_construct(self):
         """ Test `gametable.GameTable.construct` """
@@ -224,6 +227,13 @@ class GameTableTests(unittest.TestCase):
         self.assertEqual(record.column, 27)
         self.assertEqual(record.player1_name, 'Player 1')
         self.assertEqual(record.player2_name, 'Player 2')
+
+    def test_minimax_no_exceptions(self):
+        """ Test that no exceptions are raised when computing minimax ratios. """
+
+        game_table = self.proto_game_table(minimax=True)
+        game_table.construct()
+        str(game_table)
         
 
 if __name__ == "__main__":

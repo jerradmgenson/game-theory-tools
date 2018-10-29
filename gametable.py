@@ -82,7 +82,7 @@ class GameTable:
         self.player1_dominated = []
         self.player2_dominated = []
         self.nash_equilibria = set()
-        self.minimax = False
+        self.minimax = minimax
         self.player1_mixing_ratios = None
         self.player2_mixing_ratios = None
 
