@@ -38,6 +38,7 @@ import re
 
 import numpy as np
 import matplotlib.pyplot as plt
+import sympy
 
 
 class GameTable:
@@ -45,12 +46,12 @@ class GameTable:
     A traditional game table structure used in game theory to represent the
     payoff values for a two player game across a given domain. Currently
     limited to two players.
-    
+
     @Note
       If any of the optional arguments to the constructor aren't given at
       instantiation, they must be assigned to the instance prior to calling
-      its `construct` method. 
-    
+      its `construct` method.
+
     @Options
       player1_name: Player 1's name as a str.
       player2_name: Player 2's name as a str.
@@ -61,9 +62,9 @@ class GameTable:
                            choice and player 1's current choice. Calculates the
                            value of player 2's payoff and returns it.
       choices: A collection of all possible player choices.
-      
+     
     """
-    
+   
     def __init__(self, player1_name='Player 1', player2_name='Player 2',
                  calc_player1_payoff=None, calc_player2_payoff=None,
                  choices=None):
@@ -81,7 +82,7 @@ class GameTable:
         self.player1_dominated = []
         self.player2_dominated = []
         self.nash_equilibria = set()
-        
+       
     def __iter__(self):
         return RowIterator(self)
 
@@ -187,25 +188,25 @@ class GameTable:
         def create_payoff_expressions(player_name):
             if player_name == self.player1_name:
                 base_variable = 'x'
-                player_number = '1'
+                player_number = 1
 
             elif player_name == self.player2_name:
                 base_variable = 'y'
-                player_number = '2'
+                player_number = 2
 
             else:
                 raise ValueError("`player_name` not '{}' or '{}'.".format(self.player1_name, self.player2_name))
 
             expressions = []
             variables = []
-            for records in getattr(self, 'iterplayer' + player_number):
+            for records in self.iterplayer(player_number):
                 expression = 0
-                for record_number, record in enumerate(records):
+                for record_number, payoff in enumerate(records):
                     try:
                         variable = variables[record_number]
 
                     except IndexError:
-                        if record_number + 1 < len(records):
+                        if record_number + 1 < len(self.choices):
                             variable = sympy.symbols(base_variable + str(record_number))
 
                         else:
@@ -213,7 +214,7 @@ class GameTable:
 
                         variables.append(variable)
 
-                    expression += record.payoff * variable
+                    expression += payoff * variable
 
                 expressions.append(expression)
 
@@ -233,6 +234,15 @@ class GameTable:
         # mixing ratios in the same order as the order of choices in the game
         # table instance.
         return player1_solutions, player2_solutions
+
+    def iterplayer(self, player_number):
+        payoffs = getattr(self, 'player{}_payoffs'.format(player_number))
+        def iterrecords():
+            for my_choice in self.choices:
+                yield payoffs[my_choice, their_choice]
+            
+        for their_choice in self.choices:
+            yield iterrecords()
 
     def construct(self, choices=None):
         """
@@ -267,6 +277,9 @@ class GameTable:
         self.player1_dominated = self._find_player1_dominants(dominated=True)
         self.player2_dominated = self._find_player2_dominants(dominated=True)
         self.nash_equilibria = self._find_nash_equilibria()
+        p1_mixing_ratios, p2_mixing_rations = self._find_minimax()
+        self.player1_mixing_ratios = p1_mixing_ratios
+        self.player2_mixing_ratios = p2_mixing_rations
 
     def index(self, player1_choice, player2_choice):
         """
