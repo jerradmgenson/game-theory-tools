@@ -356,13 +356,13 @@ class GameTable:
 
         if self.minimax:
             # Add minimax ratios to table string.
-            str_rep += '\n\nPlayer 1 mixing ratios\n'
-            for choice, ratio in zip(self.choices, self.player1_mixing_ratios):
-                str_rep += 'Choice: {} Ratio: {};'.format(choice, ratio)
+            str_rep += '\n\nPlayer 1 mixing ratios;'
+            for ratio in next(iter(self.player1_mixing_ratios)):
+                str_rep += '{};'.format(ratio)
 
-            str_rep += '\n\nPlayer 2 mixing ratios\n'
-            for choice, ratio in zip(self.choices, self.player2_mixing_ratios):
-                str_rep += 'Choice: {} Ratio: {};'.format(choice, ratio)
+            str_rep += '\nPlayer 2 mixing ratios;'
+            for ratio in next(iter(self.player2_mixing_ratios)):
+                str_rep += '{};'.format(ratio)
         
         return str_rep
 
