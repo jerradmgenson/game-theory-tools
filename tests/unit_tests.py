@@ -85,7 +85,7 @@ class GameTableTests(unittest.TestCase):
 
         game_table = PROTO_GAME_TABLE(minimax=True)
         game_table.construct()
-        self.assertEqual(str(game_table), self.TEST_DATA.expected_game_table_str)
+        self.assertEqual(str(game_table).strip(), self.TEST_DATA.expected_game_table_str.strip())
         
     def test_find_dominants_no_dominants(self):
         """ Test `gametable.GameTable._find_dominants` on a case with no
@@ -219,13 +219,6 @@ class GameTableTests(unittest.TestCase):
         self.assertEqual(record.column, 27)
         self.assertEqual(record.player1_name, 'Player 1')
         self.assertEqual(record.player2_name, 'Player 2')        
-
-#    def test_minimax_no_exceptions(self):
-#        """ Test that no exceptions are raised when computing minimax ratios. """
-#
-#        game_table = PROTO_GAME_TABLE(minimax=True)
-#        game_table.construct()
-#        str(game_table)
 
 
 PROTO_GAME_TABLE = partial(GameTable,

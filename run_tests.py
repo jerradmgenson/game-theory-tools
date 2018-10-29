@@ -40,4 +40,4 @@ def test_suite():
 
 if __name__ == '__main__':
     config()
-    unittest.TextTestRunner().run(test_suite())
+    unittest.TextTestRunner(verbosity=VERBOSITY).run(test_suite())
