@@ -228,15 +228,21 @@ class GameTable:
 
         # For each player, set each of that player's choice equations against
         # as equal to each other and solve the system of equations.
-        player1_solutions = sympy.linsolve(player1_expressions, player1_variables)
-        player2_solutions = sympy.linsolve(player2_expressions, player2_variables)
+        player1_solutions = list(next(iter(sympy.linsolve(player1_expressions, player1_variables))))
+        player2_solutions = list(next(iter(sympy.linsolve(player2_expressions, player2_variables))))
+
+        # Substitute numeric values in final expression.
+        p1_subs = zip(player1_variables, player1_solutions)
+        p2_subs = zip(player2_variables, player2_solutions)
+        player1_solutions[-1] = player1_solutions[-1].subs([(variable, value) for variable, value in p1_subs])
+        player2_solutions[-1] = player2_solutions[-1].subs([(variable, value) for variable, value in p2_subs])
 
         # Return a tuple of sets describing each player's mixing ratios.
         # The first element in the tuple is player 1's ratios and the
         # second element is player 2's ratios. Each tuple element is a set of
         # mixing ratios in the same order as the order of choices in the game
         # table instance.
-        return player1_solutions, player2_solutions
+        return tuple(player1_solutions), tuple(player2_solutions)
 
     def iterplayer(self, player_number):
         payoffs = getattr(self, 'player{}_payoffs'.format(player_number))
@@ -280,7 +286,7 @@ class GameTable:
         self.player1_dominated = self._find_player1_dominants(dominated=True)
         self.player2_dominated = self._find_player2_dominants(dominated=True)
         self.nash_equilibria = self._find_nash_equilibria()
-        if self.minimax:    
+        if self.minimax:
             p1_mixing_ratios, p2_mixing_rations = self._find_minimax()
             self.player1_mixing_ratios = p1_mixing_ratios
             self.player2_mixing_ratios = p2_mixing_rations
@@ -357,11 +363,11 @@ class GameTable:
         if self.minimax:
             # Add minimax ratios to table string.
             str_rep += '\n\nPlayer 1 mixing ratios;'
-            for ratio in next(iter(self.player1_mixing_ratios)):
+            for ratio in self.player1_mixing_ratios:
                 str_rep += '{};'.format(ratio)
 
             str_rep += '\nPlayer 2 mixing ratios;'
-            for ratio in next(iter(self.player2_mixing_ratios)):
+            for ratio in self.player2_mixing_ratios:
                 str_rep += '{};'.format(ratio)
         
         return str_rep

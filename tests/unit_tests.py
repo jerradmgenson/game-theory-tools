@@ -249,7 +249,7 @@ class GameTableTests(unittest.TestCase):
 
         game_table.construct()
         self.assertEqual(game_table.player1_mixing_ratios, target_mixing_ratios)
-        self.assertEqual(game_table.player2_mixing_ratios, target_mixing_ratios)        
+        self.assertEqual(game_table.player2_mixing_ratios, target_mixing_ratios)
 
 
 PROTO_GAME_TABLE = partial(GameTable,
