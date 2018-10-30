@@ -309,7 +309,7 @@ class GameTable:
         # Table legend.
         str_rep = ';Vertical axis: {0};Horizontal axis: {1};Payoff pairs: {0}, {1}\n\n'.format(self.player1_name, 
                                                                                                self.player2_name)
-        # Column heading for all choices. 
+        # Column heading for all choices.
         heading = ';'
         for choice in self.choices:
             heading += str(choice) + ';'
@@ -318,7 +318,7 @@ class GameTable:
         for row in self:
             for record in row:
                 if record.column == 0:
-                    # Row heading for current row only. 
+                    # Row heading for current row only.
                     str_rep += '\n{};'.format(record.player1_choice)
 
                 str_rep += '{}, {};'.format(round(record.player1_payoff),

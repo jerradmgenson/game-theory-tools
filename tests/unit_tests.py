@@ -37,6 +37,8 @@ import unittest
 import logging
 from functools import partial
 
+from sympy import Rational
+
 from gametable import GameTable
 from tests.test_data import GameTableTestData
 
@@ -218,7 +220,36 @@ class GameTableTests(unittest.TestCase):
         self.assertEqual(record.row, 27)
         self.assertEqual(record.column, 27)
         self.assertEqual(record.player1_name, 'Player 1')
-        self.assertEqual(record.player2_name, 'Player 2')        
+        self.assertEqual(record.player2_name, 'Player 2')
+
+    def test_minimax_rock_paper_scissors(self):
+        """
+        Test GameTable._find_minimax on a simple game of rock, paper, scissors.
+
+        """
+
+        target_mixing_ratios = (Rational(1, 3),) * 3
+        choices = ('rock', 'paper', 'scissors')
+        def calc_payoff(my_choice, their_choice):
+            my_index = choices.index(my_choice)
+            their_index = choices.index(their_choice)
+            if my_choice == their_choice:
+                return 0
+
+            elif my_index in (their_index + 1, their_index - 2):
+                return 1
+
+            else:
+                return -1
+
+        game_table = GameTable(calc_player1_payoff=calc_payoff,
+                               calc_player2_payoff=calc_payoff,
+                               choices=choices,
+                               minimax=True)
+
+        game_table.construct()
+        self.assertEqual(game_table.player1_mixing_ratios, target_mixing_ratios)
+        self.assertEqual(game_table.player2_mixing_ratios, target_mixing_ratios)        
 
 
 PROTO_GAME_TABLE = partial(GameTable,
