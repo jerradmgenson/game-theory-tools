@@ -229,7 +229,7 @@ class GameTableTests(unittest.TestCase):
         """
 
         target_mixing_ratios = (Rational(1, 3),) * 3
-        choices = ('rock', 'paper', 'scissors')
+        choices = 'rock', 'paper', 'scissors'
         def calc_payoff(my_choice, their_choice):
             my_index = choices.index(my_choice)
             their_index = choices.index(their_choice)
@@ -250,6 +250,55 @@ class GameTableTests(unittest.TestCase):
         game_table.construct()
         self.assertEqual(game_table.player1_mixing_ratios, target_mixing_ratios)
         self.assertEqual(game_table.player2_mixing_ratios, target_mixing_ratios)
+
+    def test_minimax_penalty_kick(self):
+        """
+        Test GameTable.__find_minimax for a penalty kick in a game of football
+        between a kicker and a goalie.
+
+        """
+
+        choices = 'left', 'right'
+        kicker_mixing_ratios = 0.383, 0.617
+        goalie_mixing_ratios = 0.417, 0.583
+        def calc_goalie_payoff(my_choice, their_choice):
+            if my_choice == 'left':
+                if their_choice == 'left':
+                    return 52
+
+                else:
+                    return 7
+
+            else:
+                if their_choice == 'left':
+                    return 5
+
+                else:
+                    return 30
+
+        def calc_kicker_payoff(my_choice, their_choice):
+            if my_choice == 'left':
+                if their_choice == 'left':
+                    return 58
+
+                else:
+                    return 95
+
+            else:
+                if their_choice == 'left':
+                    return 93
+
+                else:
+                    return 70
+
+        game_table = GameTable(calc_player1_payoff=calc_kicker_payoff,
+                               calc_player2_payoff=calc_goalie_payoff,
+                               choices=choices,
+                               minimax=True)
+
+        game_table.construct()
+        self.assertEqual(game_table.player1_mixing_ratios, kicker_mixing_ratios)
+        self.assertEqual(game_table.player2_mixing_ratios, goalie_mixing_ratios)
 
 
 PROTO_GAME_TABLE = partial(GameTable,
